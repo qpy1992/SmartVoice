@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.spring.springboot.dao.UserDao">
+	<insert id="insert" parameterType="java.util.Map" >
+		insert zk_register(id,wx_openid,wx_pic,fstatus,ftelephone,wx_name,create_date)
+		values
+		(
+			#{id},#{open_id},#{head_img},0,#{mobile},#{nickname},now()
+		)
+		<selectKey  keyProperty="id" resultType="java.lang.String" order="BEFORE">
+		        select REPLACE(UUID(),'-','')
+		</selectKey>
+	</insert>
+	
+	<insert id="insertPC" parameterType="java.util.Map" >
+		insert zk_register(id,fstatus,ftelephone,fpassword,create_date,head_pic,fname)
+		values
+		(
+			#{id},0,#{mobile},#{fpassword},now(),#{head_pic},left(uuid(),8)
+		)
+		<selectKey  keyProperty="id" resultType="java.lang.String" order="BEFORE">
+		        select REPLACE(UUID(),'-','')
+		</selectKey>
+	</insert>
+	<update id="update" parameterType="java.util.Map">
+		update zk_register set
+		wx_name=#{nickname},
+		wx_pic=#{head_img},
+		ftelephone=#{mobile}
+		where wx_openid=#{open_id}
+	</update>
+	
+	
+	
+    <update id="updateWxInfo" parameterType="java.util.Map">
+		update zk_register set
+		wx_name=#{nickname},
+		wx_pic=#{head_img},
+		wx_openid=#{open_id}
+		where ftelephone=#{mobile}
+	</update>
+	
+	<update id="updatePC" parameterType="java.util.Map">
+		update zk_register set
+		head_pic=#{head_pic},
+		fname=#{fnickname}
+		where ftelephone=#{mobile}
+	</update>
+	
+   <update id="updateFpassword" parameterType="java.util.Map">
+		update zk_register set
+		fpassword=#{fpassword}
+		where ftelephone=#{mobile}
+	</update>
+	
+	<select id="list" resultType="java.util.Map">
+		select * from zk_register where wx_openid=#{open_id}
+	</select>
+	
+	<select id="count" resultType="int">
+         SELECT count(1) from zk_register where ftelephone=#{mobile}
+     </select>
+     
+     <select id="memberInfo" resultType="java.util.Map">
+		select * from zk_register where ftelephone=#{mobile}
+	</select>
+	
+	<select id="login" resultType="java.util.Map">
+		select * from zk_register where ftelephone=#{mobile} and fpassword=#{fpassword}
+	</select>
+	<select id="serProvinceList" resultType="java.util.Map">
+			select  provinceId,provinceName from fch_province
+    </select>
+
+	<select id="serCityList" resultType="java.util.Map">
+			select  cityId,cityName from fch_city  where  cityUpId = #{provinceId}
+    </select>
+
+	<select id="serDistrictList" resultType="java.util.Map">
+			select  districtName   from fch_district where districtUpId = #{cityId}
+    </select>
+
+
+     <select id="registerInfo" resultType="java.util.Map">
+		SELECT fnickname,ftelephone,head_pic FROM zk_register where id = #{registerid}
+	</select>
+
+</mapper>
